@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routers import auth, tickets, user, admin
+from routers import auth, tickets, user, admin
 
 app = FastAPI()
 app.include_router(auth.router)
