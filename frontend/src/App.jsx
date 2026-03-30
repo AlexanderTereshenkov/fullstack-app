@@ -22,7 +22,7 @@ function PrivateRoute({ children, allowedRoles = [] }) {
   return children;
 }
 
-const theme = createTheme(); // можно настроить тему позже
+const theme = createTheme();
 
 function App() {
   const [user, setUser] = useState(null);
