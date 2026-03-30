@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
-from backend import crud, models, schemas
+from backend import crud, models, shemas
 from backend.database import get_db
 
 
@@ -37,7 +37,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         email: str = payload.get("sub")
         if email is None:
             raise credentials_exception
-        token_data = schemas.TokenData(email=email)  # можно создать схему TokenData
+        token_data = shemas.TokenData(email=email)  # можно создать схему TokenData
     except JWTError:
         raise credentials_exception
     user = crud.get_user_by_email(db, email=token_data.email)

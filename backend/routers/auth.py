@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
-from backend import crud, schemas, dependencies
+from backend import crud, shemas, dependencies
 from backend.database import get_db
 from backend.utils.security import verify_password, get_password_hash  # напишем ниже
 
@@ -10,8 +10,8 @@ from backend.utils.security import verify_password, get_password_hash  # нап�
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/register", response_model=schemas.UserResponse)
-def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
+@router.post("/register", response_model=shemas.UserResponse)
+def register(user: shemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -20,7 +20,7 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return db_user
 
 
-@router.post("/login", response_model=schemas.Token)
+@router.post("/login", response_model=shemas.Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = crud.get_user_by_email(db, email=form_data.username)
     if not user or not verify_password(form_data.password, user.hashed_password):

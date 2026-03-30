@@ -2,9 +2,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# URL базы данных (можно вынести в .env)
-SQLALCHEMY_DATABASE_URL = "sqlite:///./app.db"  # для SQLite
-# SQLALCHEMY_DATABASE_URL = "postgresql://user:pass@localhost/dbname"
+# file-based база данных
+SQLALCHEMY_DATABASE_URL = "sqlite:///app.db"  # для SQLite
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,

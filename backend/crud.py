@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from backend import models, schemas
+from backend import models, shemas
 
 
 # ---- События ----
@@ -11,7 +11,7 @@ def get_events(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Event).offset(skip).limit(limit).all()
 
 
-def create_event(db: Session, event: schemas.EventCreate):
+def create_event(db: Session, event: shemas.EventCreate):
     db_event = models.Event(**event.dict())
     db.add(db_event)
     db.commit()
@@ -19,7 +19,7 @@ def create_event(db: Session, event: schemas.EventCreate):
     return db_event
 
 
-def update_event(db: Session, event_id: int, event_update: schemas.EventUpdate):
+def update_event(db: Session, event_id: int, event_update: shemas.EventUpdate):
     db_event = get_event(db, event_id)
     if not db_event:
         return None
@@ -45,7 +45,7 @@ def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
 
 
-def create_user(db: Session, user: schemas.UserCreate, hashed_password: str):
+def create_user(db: Session, user: shemas.UserCreate, hashed_password: str):
     db_user = models.User(
         email=user.email,
         hashed_password=hashed_password,

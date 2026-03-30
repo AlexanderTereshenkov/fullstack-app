@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean
 from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy.orm import relationship
+from backend.database import Base
 
-Base = declarative_base()
 
 class User(Base):
     __tablename__ = "users"
@@ -12,7 +12,7 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     role = Column(String, default="user")  # "admin" или "user"
-    created_at = Column(DateTime, default=datetime.now(datetime.timezone.utc))
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     tickets = relationship("Ticket", back_populates="user")
 
@@ -26,9 +26,9 @@ class Event(Base):
     date = Column(DateTime, nullable=False)
     location = Column(String, nullable=False)
     poster_url = Column(String)  # ссылка на афишу
-    created_at = Column(DateTime, default=datetime.now(datetime.timezone.utc))
-    updated_at = Column(DateTime, default=datetime.now(datetime.timezone.utc), 
-                        onupdate=datetime.now(datetime.timezone.utc))
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=datetime.now(timezone.utc), 
+                        onupdate=datetime.now(timezone.utc))
 
     tickets = relationship("Ticket", back_populates="event")
 
@@ -39,8 +39,7 @@ class Ticket(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     event_id = Column(Integer, ForeignKey("events.id"))
-    purchased_at = Column(DateTime, default=datetime.now(datetime.timezone.utc))
-    qr_code = Column(String, unique=True)  # сгенерированный уникальный код
+    purchased_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     user = relationship("User", back_populates="tickets")
     event = relationship("Event", back_populates="tickets")
