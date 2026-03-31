@@ -24,6 +24,9 @@ class Token(BaseModel):
     token_type: str = "bearer"
     user: str = "user"
 
+class TokenData(BaseModel):
+    email: str
+
 
 # === События ===
 class EventBase(BaseModel):

@@ -7,12 +7,13 @@ from backend import crud, models, shemas
 from backend.database import get_db
 
 
-# Настройки JWT (лучше хранить в .env)
-SECRET_KEY = "your-secret-key-here"
+# ПЛОХО ИСПРАВИТЬ БЕЗОПАСНОСТЬ
+SECRET_KEY = "meow-meow"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")  # эндпоинт логина
+# эндпоинт, где проверяем логин/пароль
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
@@ -37,16 +38,16 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         email: str = payload.get("sub")
         if email is None:
             raise credentials_exception
-        token_data = shemas.TokenData(email=email)  # можно создать схему TokenData
+        token_data = shemas.TokenData(email=email)
     except JWTError:
         raise credentials_exception
+    
     user = crud.get_user_by_email(db, email=token_data.email)
     if user is None:
         raise credentials_exception
     return user
 
 
-# Опционально: зависимость для проверки прав админа
 def get_current_admin(current_user: models.User = Depends(get_current_user)):
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")

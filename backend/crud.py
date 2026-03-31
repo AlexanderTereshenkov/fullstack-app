@@ -11,6 +11,12 @@ def get_events(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Event).offset(skip).limit(limit).all()
 
 
+def get_user_events(db: Session, user_id: int):
+    return db.query(models.Event).join(
+        models.Ticket, models.Ticket.event_id == models.Event.id
+    ).filter(models.Ticket.user_id == user_id).all()
+
+
 def create_event(db: Session, event: shemas.EventCreate):
     db_event = models.Event(**event.dict())
     db.add(db_event)
