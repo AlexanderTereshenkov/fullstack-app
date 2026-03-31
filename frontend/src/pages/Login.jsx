@@ -21,11 +21,11 @@ export default function Login({ setUser }) {
       });
       
       localStorage.setItem('token', response.data.access_token);
-      //localStorage.setItem('user', JSON.stringify(response.data.user));
+      localStorage.setItem('user', JSON.stringify(response.data.user));
       setUser(response.data.user);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Ошибка входа');
+      setError(err.response?.data?.detail || 'Неизвестная ошибка входа');
     }
   };
 

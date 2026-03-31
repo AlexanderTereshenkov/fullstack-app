@@ -10,7 +10,7 @@ export default function Events() {
 
   useEffect(() => {
     const fetchEvents = async () => {
-      const res = await api.get('/tickets/');
+      const res = await api.get('/events/');
       setEvents(res.data);
     };
     fetchEvents();
@@ -21,14 +21,14 @@ export default function Events() {
       <Typography variant="h4" gutterBottom>
         События
       </Typography>
-      {user?.role === 'admin' && (
+      {user === 'admin' && (
         <Button variant="contained" sx={{ mb: 2 }} onClick={() => navigate('/admin/upload-poster')}>
           Добавить событие
         </Button>
       )}
       <Grid container spacing={3}>
         {events.map((event) => (
-          <Grid item xs={12} sm={6} md={4} key={event.id}>
+          <Grid item xs={12} key={event.id}>
             <Card sx={{ cursor: 'pointer' }} onClick={() => navigate(`/events/${event.id}`)}>
               <CardContent>
                 <Typography variant="h6">{event.title}</Typography>

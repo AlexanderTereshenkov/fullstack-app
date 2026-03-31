@@ -2,10 +2,10 @@ from datetime import datetime, timezone
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from backend.models import Event
-from backend.database import Base  # замените на правильный импорт
+from backend.database import Base
 
 # Подставьте путь к вашей базе данных (например, "sqlite:///./app.db")
-DATABASE_URL = "sqlite:///app.db"
+DATABASE_URL = "sqlite:///backend/app.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -40,5 +40,4 @@ def seed_events():
     finally:
         db.close()
 
-if __name__ == "__main__":
-    seed_events()
+seed_events()

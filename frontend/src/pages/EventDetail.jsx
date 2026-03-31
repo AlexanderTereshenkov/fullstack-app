@@ -26,7 +26,7 @@ export default function EventDetail() {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const res = await api.get(`/tickets/${id}`);
+        const res = await api.get(`/events/${id}`);
         setEvent(res.data);
         setFormData(res.data);
       } catch (err) {

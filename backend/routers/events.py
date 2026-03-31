@@ -19,5 +19,5 @@ def read_events(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 def read_event(event_id: int, db: Session = Depends(get_db)):
     db_event = crud.get_event(db, event_id)
     if not db_event:
-        raise HTTPException(status_code=404, detail="Event not found")
+        raise HTTPException(status_code=404, detail="Такого события нет.")
     return db_event

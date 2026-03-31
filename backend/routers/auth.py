@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from datetime import timedelta
 from backend import crud, shemas, dependencies
 from backend.database import get_db
-from backend.utils.security import verify_password, get_password_hash  # напишем ниже
+from backend.utils.security import verify_password, get_password_hash
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 def register(user: shemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="Email уже зарегистрирован.")
     hashed_password = get_password_hash(user.password)
     db_user = crud.create_user(db, user, hashed_password)
     return db_user
@@ -24,9 +24,9 @@ def register(user: shemas.UserCreate, db: Session = Depends(get_db)):
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = crud.get_user_by_email(db, email=form_data.username)
     if not user or not verify_password(form_data.password, user.hashed_password):
-        raise HTTPException(status_code=401, detail="Incorrect email or password")
+        raise HTTPException(status_code=401, detail="Неправильная почта или пароль.")
     access_token = dependencies.create_access_token(data={"sub": user.email})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "user":str(user.role)}
 
 
 @router.post("/logout")

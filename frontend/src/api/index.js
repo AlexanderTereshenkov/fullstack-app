@@ -4,10 +4,10 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true, // если бэкенд использует cookies
+  withCredentials: true,
 });
 
-// Перехватчик для добавления JWT-токена (если храните его в localStorage)
+// Перехватчик для добавления JWT-токена
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
