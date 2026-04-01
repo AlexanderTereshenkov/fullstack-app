@@ -26,6 +26,7 @@ class Event(Base):
     date = Column(DateTime, nullable=False)
     location = Column(String, nullable=False)
     poster_url = Column(String)  # ссылка на афишу
+    admin_id = Column(Integer, nullable=True) # если создал админ, то будет его ID
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=datetime.now(timezone.utc), 
                         onupdate=datetime.now(timezone.utc))

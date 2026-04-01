@@ -9,7 +9,6 @@ class UserCreate(BaseModel):
     password: str = Field(..., min_length=6, max_length=72)
 
 class UserResponse(BaseModel):
-    id: int
     email: str
     role: str
     created_at: datetime
@@ -36,8 +35,15 @@ class EventBase(BaseModel):
     location: str = Field(..., min_length=3, max_length=200)
     poster_url: Optional[str] = None
 
-class EventCreate(EventBase):
-    pass
+
+class EventCreate(BaseModel):
+    title: str
+    description: str | None = None
+    date: str          
+    time: str | None = None
+    location: str
+    poster_url: str | None = None
+
 
 class EventUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=3, max_length=100)

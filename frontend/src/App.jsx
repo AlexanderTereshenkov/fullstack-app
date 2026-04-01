@@ -11,12 +11,13 @@ import EventDetail from './pages/EventDetail';
 import Profile from './pages/Profile';
 import AdminProfile from './pages/AdminProfile';
 import UploadPoster from './pages/UploadPoster';
+import Navbar from './components/Navbar';
 
 // Компонент для защиты маршрутов
 function PrivateRoute({ children, allowedRoles = [] }) {
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = localStorage.getItem('user');
   if (!user) return <Navigate to="/login" />;
-  if (allowedRoles.length && !allowedRoles.includes(user.role)) {
+  if (allowedRoles.length && !allowedRoles.includes(user)) {
     return <Navigate to="/" />;
   }
   return children;
@@ -29,14 +30,14 @@ function App() {
 
   useEffect(() => {
     const stored = localStorage.getItem('user');
-    console.log(stored)
-    if (stored) setUser(JSON.parse(stored));
+    if (stored) setUser(stored);
   }, []);
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
+        <Navbar />
         <Routes>
           <Route path="/login" element={<Login setUser={setUser} />} />
           <Route path="/register" element={<Register />} />
@@ -53,7 +54,7 @@ function App() {
           <Route
             path="/admin/profile"
             element={
-              <PrivateRoute allowedRoles={['admin']}>
+              <PrivateRoute allowedRoles={["admin"]}>
                 <AdminProfile user={user} />
               </PrivateRoute>
             }

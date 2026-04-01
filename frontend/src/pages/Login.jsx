@@ -21,7 +21,7 @@ export default function Login({ setUser }) {
       });
       
       localStorage.setItem('token', response.data.access_token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      localStorage.setItem('user', response.data.user);
       setUser(response.data.user);
       navigate('/');
     } catch (err) {

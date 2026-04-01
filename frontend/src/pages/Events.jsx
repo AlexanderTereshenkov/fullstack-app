@@ -6,7 +6,10 @@ import api from '../api';
 export default function Events() {
   const [events, setEvents] = useState([]);
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user'));
+  //const user = localStorage.getItem('user');
+  console.log('Start of file');
+  const user = localStorage.getItem('user');
+  console.log('user from localStorage:', user);
 
   useEffect(() => {
     const fetchEvents = async () => {

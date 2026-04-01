@@ -17,8 +17,8 @@ def get_user_events(db: Session, user_id: int):
     ).filter(models.Ticket.user_id == user_id).all()
 
 
-def create_event(db: Session, event: shemas.EventCreate):
-    db_event = models.Event(**event.dict())
+def create_event(db: Session, event: shemas.EventBase):
+    db_event = models.Event(**event)
     db.add(db_event)
     db.commit()
     db.refresh(db_event)

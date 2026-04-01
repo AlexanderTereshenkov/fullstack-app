@@ -33,7 +33,7 @@ export default function UploadPoster() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/admin/add_ticket', formData);
+      await api.post('/admin/add_event', formData);
       alert('Событие добавлено');
     } catch (err) {
       setError('Ошибка сохранения');

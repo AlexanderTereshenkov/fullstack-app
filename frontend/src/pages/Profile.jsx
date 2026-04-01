@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   Typography,
@@ -6,8 +7,15 @@ import {
   CardContent,
   CircularProgress,
   Alert,
-  Grid
+  Grid,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Button,
+  IconButton
 } from '@mui/material';
+import { QrCodeScanner as QrCodeIcon } from '@mui/icons-material'; // если используете Material Icons
+import { QRCodeSVG } from 'qrcode.react';
 import api from '../api';
 
 export default function Profile() {
@@ -16,6 +24,10 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [ticketsLoading, setTicketsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [openQrDialog, setOpenQrDialog] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -46,6 +58,16 @@ export default function Profile() {
     fetchTickets();
   }, []);
 
+  const handleOpenQr = (ticket) => {
+    setSelectedTicket(ticket);
+    setOpenQrDialog(true);
+  };
+
+  const handleCloseQr = () => {
+    setOpenQrDialog(false);
+    setSelectedTicket(null);
+  };
+
   if (loading) {
     return (
       <Container sx={{ mt: 4, textAlign: 'center' }}>
@@ -55,11 +77,7 @@ export default function Profile() {
   }
 
   if (error) {
-    return (
-      <Container sx={{ mt: 4 }}>
-        <Alert severity="error">{error}</Alert>
-      </Container>
-    );
+    navigate('/login')
   }
 
   if (!user) {
@@ -76,9 +94,6 @@ export default function Profile() {
         <CardContent>
           <Typography variant="h4" gutterBottom>
             Мой профиль
-          </Typography>
-          <Typography variant="body1">
-            <strong>ID:</strong> {user.id}
           </Typography>
           <Typography variant="body1">
             <strong>Email:</strong> {user.email}
@@ -112,12 +127,44 @@ export default function Profile() {
                     {new Date(ticket.date).toLocaleString()}
                   </Typography>
                   <Typography variant="body2">{ticket.location}</Typography>
+                  <IconButton 
+                    onClick={() => handleOpenQr(ticket)} 
+                    sx={{ mt: 1 }}
+                    color="primary"
+                  >
+                    <QrCodeIcon />
+                  </IconButton>
                 </CardContent>
               </Card>
             </Grid>
           ))}
         </Grid>
       )}
+
+      {/* Модальное окно с QR-кодом */}
+      <Dialog open={openQrDialog} onClose={handleCloseQr}>
+        <DialogTitle>QR-код билета</DialogTitle>
+        <DialogContent sx={{ textAlign: 'center' }}>
+          {selectedTicket && (
+            <>
+              <QRCodeSVG 
+                value={`Билет #${selectedTicket.id}\n
+                Мероприятие: ${selectedTicket.title}\n
+                Дата: ${new Date(selectedTicket.date).toLocaleString()}\n
+                Место: ${selectedTicket.location}`}
+                size={200}
+                level="H"
+              />
+              <Typography variant="caption" display="block" sx={{ mt: 2 }}>
+                Покажите этот код при входе на мероприятие.
+              </Typography>
+            </>
+          )}
+          <Button onClick={handleCloseQr} sx={{ mt: 2 }} variant="contained">
+            Закрыть
+          </Button>
+        </DialogContent>
+      </Dialog>
     </Container>
   );
 }
