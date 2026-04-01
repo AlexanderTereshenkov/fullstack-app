@@ -11,13 +11,13 @@ export default function AdminProfile() {
   useEffect(() => {
     const fetchAdminEvents = async () => {
       const res = await api.get('/admin/me'); // предположим, что возвращает список событий админа
-      setEvents(res.data.events);
+      setEvents(res.data);
     };
     fetchAdminEvents();
   }, []);
 
   const handleDelete = async (id) => {
-    await api.delete(`/admin/delete_ticket/${id}`);
+    await api.delete(`/admin/delete_event/${id}`);
     setEvents(events.filter(e => e.id !== id));
   };
 

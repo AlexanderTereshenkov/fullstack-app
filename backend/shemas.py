@@ -46,6 +46,7 @@ class EventCreate(BaseModel):
 
 
 class EventUpdate(BaseModel):
+    id: int
     title: Optional[str] = Field(None, min_length=3, max_length=100)
     description: Optional[str] = None
     date: Optional[datetime] = None
@@ -70,3 +71,7 @@ class TicketResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+class TicketAdminRespone(BaseModel):
+    admin_id:Optional[int] = None
+    event_creator_id:Optional[int] = None

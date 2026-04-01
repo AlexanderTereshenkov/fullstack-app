@@ -11,7 +11,13 @@ from datetime import datetime
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 
-@router.put("/{event_id}", response_model=shemas.EventResponse)
+@router.get("/me")
+def get_admin_events(current_user: User = Depends(get_current_user),
+                     db: Session = Depends(get_db),):
+    return crud.get_admin_events(db, current_user.id)
+
+
+@router.put("/update_event/{event_id}", response_model=shemas.EventResponse)
 def update_event(
     event_id: int,
     event_update: shemas.EventUpdate,
@@ -19,23 +25,26 @@ def update_event(
     current_user: User = Depends(get_current_user)
 ):
     if current_user.role != "admin":
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+        raise HTTPException(status_code=403, detail="Недостаточно прав.")
+    event_creator_id = crud.get_event(db, event_id).admin_id
+    if not event_creator_id or current_user.id != event_creator_id:
+        raise HTTPException(status_code=403, detail="Мы не владеем событием.")
     db_event = crud.update_event(db, event_id, event_update)
     if not db_event:
-        raise HTTPException(status_code=404, detail="Event not found")
+        raise HTTPException(status_code=404, detail="Событие не найдено.")
     return db_event
 
 
-@router.delete("/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/delete_event/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_event(
     event_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     if current_user.role != "admin":
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+        raise HTTPException(status_code=403, detail="Недостаточно прав.")
     if not crud.delete_event(db, event_id):
-        raise HTTPException(status_code=404, detail="Event not found")
+        raise HTTPException(status_code=404, detail="Событие не найдено.")
     
 
 @router.post("/add_event", response_model=shemas.EventResponse)
@@ -45,7 +54,7 @@ def add_event(
     current_user: User = Depends(get_current_user),
 ):
     if current_user.role != "admin":
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+        raise HTTPException(status_code=403, detail="Недостаточно прав.")
 
     # Объединяем дату и время в один datetime
     date_str = event_data.date
@@ -53,7 +62,7 @@ def add_event(
     try:
         dt = datetime.strptime(f"{date_str} {time_str}", "%d.%m.%Y %H:%M")
     except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid date or time format")
+        raise HTTPException(status_code=400, detail="Неправильный формат даты/времени")
 
     # Подготавливаем данные для создания события
     event_dict = event_data.dict(exclude={"date", "time"})
@@ -63,3 +72,10 @@ def add_event(
     db_event = crud.create_event(db, event_dict)
     return db_event
 
+
+@router.get("/check_event/{event_id}", response_model=shemas.TicketAdminRespone)
+def check_event_admin(event_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)):
+    event_creator_id = crud.get_event(db, event_id).admin_id
+    return {"admin_id":current_user.id, "event_creator_id":event_creator_id}

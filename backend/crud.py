@@ -17,6 +17,10 @@ def get_user_events(db: Session, user_id: int):
     ).filter(models.Ticket.user_id == user_id).all()
 
 
+def get_admin_events(db: Session, admin_id: int):
+    return db.query(models.Event).filter(models.Event.admin_id == admin_id).all()
+
+
 def create_event(db: Session, event: shemas.EventBase):
     db_event = models.Event(**event)
     db.add(db_event)
@@ -61,4 +65,3 @@ def create_user(db: Session, user: shemas.UserCreate, hashed_password: str):
     db.commit()
     db.refresh(db_user)
     return db_user
-

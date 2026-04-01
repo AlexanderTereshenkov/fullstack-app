@@ -1,15 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Container,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  TextField,
-  Alert,
-  CircularProgress,
-  Box,
+  Container, Card, CardContent, Typography, TextField, Button,
+  CircularProgress, Alert, Box
 } from '@mui/material';
 import api from '../api';
 
@@ -21,21 +14,33 @@ export default function EventDetail() {
   const [error, setError] = useState('');
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({});
-  const user = JSON.parse(localStorage.getItem('user'));
+  const [canEdit, setCanEdit] = useState(false);
+
+  // Состояние для информации о правах
+  const [authCheck, setAuthCheck] = useState({ loading: true, isCreator: false });
 
   useEffect(() => {
-    const fetchEvent = async () => {
+    const fetchEventAndPermissions = async () => {
       try {
-        const res = await api.get(`/events/${id}`);
-        setEvent(res.data);
-        setFormData(res.data);
+        // Загружаем событие
+        const eventRes = await api.get(`/events/${id}`);
+        setEvent(eventRes.data);
+        setFormData(eventRes.data);
+
+        // Проверяем права
+        const checkRes = await api.get(`admin/check_event/${id}`);
+        // Предполагаем, что ответ содержит { admin_id, event_creator_id }
+        const isCreator = checkRes.data.admin_id === checkRes.data.event_creator_id;
+        setCanEdit(isCreator);
       } catch (err) {
         setError('Не удалось загрузить событие');
       } finally {
         setLoading(false);
+        setAuthCheck(prev => ({ ...prev, loading: false }));
       }
     };
-    fetchEvent();
+
+    fetchEventAndPermissions();
   }, [id]);
 
   const handleBuy = async () => {
@@ -47,7 +52,9 @@ export default function EventDetail() {
     }
   };
 
-  const handleEdit = () => setEditing(true);
+  const handleEdit = () => {
+    setEditing(true);
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -55,7 +62,7 @@ export default function EventDetail() {
 
   const handleUpdate = async () => {
     try {
-      await api.put(`/admin/update_ticket/${id}`, formData);
+      await api.put(`/admin/update_event/${id}`, formData);
       setEvent(formData);
       setEditing(false);
       alert('Событие обновлено');
@@ -67,6 +74,9 @@ export default function EventDetail() {
   if (loading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 4 }} />;
   if (error) return <Alert severity="error">{error}</Alert>;
   if (!event) return <Typography>Событие не найдено</Typography>;
+
+  const userRaw = localStorage.getItem('user');
+  const isLoggedIn = !!userRaw;
 
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
@@ -138,8 +148,8 @@ export default function EventDetail() {
                 {event.description}
               </Typography>
 
-              {user ? (
-                user.role === 'admin' ? (
+              {isLoggedIn ? (
+                canEdit ? (
                   <Button variant="contained" onClick={handleEdit}>
                     Редактировать
                   </Button>
