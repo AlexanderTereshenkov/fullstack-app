@@ -29,7 +29,18 @@ def update_event(
     event_creator_id = crud.get_event(db, event_id).admin_id
     if not event_creator_id or current_user.id != event_creator_id:
         raise HTTPException(status_code=403, detail="Мы не владеем событием.")
-    db_event = crud.update_event(db, event_id, event_update)
+    
+    date_str = event_update.date
+    time_str = event_update.time or "00:00"
+    print("UPDATE TIME", date_str, time_str)
+    try:
+        dt = datetime.strptime(f"{date_str} {time_str}", "%d.%m.%Y %H:%M")
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Неправильный формат даты/времени")
+
+    event_dict = event_update.dict(exclude={"date", "time"})
+    event_dict["date"] = dt
+    db_event = crud.update_event(db, event_id, event_dict)
     if not db_event:
         raise HTTPException(status_code=404, detail="Событие не найдено.")
     return db_event

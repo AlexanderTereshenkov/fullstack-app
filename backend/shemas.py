@@ -46,10 +46,10 @@ class EventCreate(BaseModel):
 
 
 class EventUpdate(BaseModel):
-    id: int
     title: Optional[str] = Field(None, min_length=3, max_length=100)
     description: Optional[str] = None
-    date: Optional[datetime] = None
+    date: Optional[str] = None         
+    time: Optional[str] = None
     location: Optional[str] = Field(None, min_length=3, max_length=200)
     poster_url: Optional[str] = None
 

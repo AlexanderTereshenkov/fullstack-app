@@ -29,12 +29,12 @@ def create_event(db: Session, event: shemas.EventBase):
     return db_event
 
 
-def update_event(db: Session, event_id: int, event_update: shemas.EventUpdate):
+def update_event(db: Session, event_id: int, event_update):
     db_event = get_event(db, event_id)
     if not db_event:
         return None
-    update_data = event_update.dict(exclude_unset=True)
-    for field, value in update_data.items():
+    # update_data = event_update.dict(exclude_unset=True)
+    for field, value in event_update.items():
         setattr(db_event, field, value)
     db.commit()
     db.refresh(db_event)
