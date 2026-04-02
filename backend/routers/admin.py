@@ -1,11 +1,12 @@
 #Личный кабинет польщзователя
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from typing import List
 from backend import crud, shemas
 from backend.dependencies import get_db, get_current_user  # предположим, что есть такие зависимости
 from backend.models import User  # модель пользователя с полем role
 from datetime import datetime
+from backend.service.ocr_llm_service import extract_event_data_from_image
 
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -90,3 +91,23 @@ def check_event_admin(event_id: int,
     current_user: User = Depends(get_current_user)):
     event_creator_id = crud.get_event(db, event_id).admin_id
     return {"admin_id":current_user.id, "event_creator_id":event_creator_id}
+
+
+@router.post("/ocr")
+async def admin_ocr(file: UploadFile = File(...),
+              current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Недостаточно прав.")
+    
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(400, "Файл должен быть изображением")
+
+    image_bytes = await file.read()
+
+    try:
+        parsed_data = extract_event_data_from_image(image_bytes)
+    except Exception as e:
+        raise HTTPException(500, f"Ошибка распознавания: {str(e)}")
+
+    return parsed_data
+
