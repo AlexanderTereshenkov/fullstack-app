@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from backend import crud, shemas
-from backend.dependencies import get_db, get_current_user  # предположим, что есть такие зависимости
-from backend.models import User  # модель пользователя с полем role
+from backend.dependencies import get_db
 
 
 router = APIRouter(prefix="/events", tags=["events"])

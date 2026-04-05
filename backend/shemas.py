@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional
 
 
-# === Пользователи ===
+
 class UserCreate(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=6, max_length=72)
@@ -17,7 +17,6 @@ class UserResponse(BaseModel):
         orm_mode = True
 
 
-# === Токен ===
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
@@ -27,7 +26,6 @@ class TokenData(BaseModel):
     email: str
 
 
-# === События ===
 class EventBase(BaseModel):
     title: str = Field(..., min_length=3, max_length=100)
     description: Optional[str] = None
@@ -53,6 +51,7 @@ class EventUpdate(BaseModel):
     location: Optional[str] = Field(None, min_length=3, max_length=200)
     poster_url: Optional[str] = None
 
+
 class EventResponse(EventBase):
     id: int
     created_at: datetime
@@ -62,7 +61,6 @@ class EventResponse(EventBase):
         orm_mode = True
 
 
-# === Билеты ===
 class TicketResponse(BaseModel):
     id: int
     event_id: int
@@ -71,6 +69,7 @@ class TicketResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
 
 class TicketAdminRespone(BaseModel):
     admin_id:Optional[int] = None

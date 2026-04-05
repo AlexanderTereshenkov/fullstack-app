@@ -1,10 +1,8 @@
-#Личный кабинет польщзователя
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
 from backend import crud, shemas
-from backend.dependencies import get_db, get_current_user  # предположим, что есть такие зависимости
-from backend.models import User, Ticket  # модель пользователя с полем role
+from backend.dependencies import get_db, get_current_user
+from backend.models import User, Ticket
 
 
 router = APIRouter(prefix="/user", tags=["user"])
@@ -53,17 +51,3 @@ def get_user_tickets(current_user: User = Depends(get_current_user),
                      db: Session = Depends(get_db)):
     return crud.get_user_events(db, current_user.id)
 
-@router.post("/delete_ticket/{ticket_id}")
-def delete_ticket(ticket_id:int):
-    '''
-    Удаляем билет из БД юзера
-    '''
-    return {"result":"delete ticket"}
-
-
-@router.post("/qr")
-def create_qr():
-    '''
-    Создаем QR на сервере возвращаем пользователю
-    '''
-    return {"result":"QR IMAGE"}

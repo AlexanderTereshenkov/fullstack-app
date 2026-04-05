@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from datetime import timedelta
 from backend import crud, shemas, dependencies
 from backend.database import get_db
 from backend.utils.security import verify_password, get_password_hash
@@ -27,10 +26,3 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         raise HTTPException(status_code=401, detail="Неправильная почта или пароль.")
     access_token = dependencies.create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "bearer", "user":str(user.role)}
-
-
-@router.post("/logout")
-def logout():
-    # На стороне сервера обычно ничего не делается, клиент просто удаляет токен
-    return {"message": "Logged out"}
-

@@ -1,10 +1,8 @@
-#Личный кабинет польщзователя
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
-from typing import List
 from backend import crud, shemas
-from backend.dependencies import get_db, get_current_user  # предположим, что есть такие зависимости
-from backend.models import User  # модель пользователя с полем role
+from backend.dependencies import get_db, get_current_user
+from backend.models import User
 from datetime import datetime
 from backend.service.ocr_llm_service import extract_event_data_from_image
 
@@ -33,7 +31,6 @@ def update_event(
     
     date_str = event_update.date
     time_str = event_update.time or "00:00"
-    print("UPDATE TIME", date_str, time_str)
     try:
         dt = datetime.strptime(f"{date_str} {time_str}", "%d.%m.%Y %H:%M")
     except ValueError:
@@ -68,7 +65,6 @@ def add_event(
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Недостаточно прав.")
 
-    # Объединяем дату и время в один datetime
     date_str = event_data.date
     time_str = event_data.time or "00:00"
     try:
@@ -76,11 +72,9 @@ def add_event(
     except ValueError:
         raise HTTPException(status_code=400, detail="Неправильный формат даты/времени")
 
-    # Подготавливаем данные для создания события
     event_dict = event_data.dict(exclude={"date", "time"})
     event_dict["date"] = dt
-    # Если нужно сохранить poster_url, добавьте его из event_dict (он уже там)
-    event_dict["admin_id"] = current_user.id  # запоминаем, кто создал
+    event_dict["admin_id"] = current_user.id
     db_event = crud.create_event(db, event_dict)
     return db_event
 
@@ -110,4 +104,3 @@ async def admin_ocr(file: UploadFile = File(...),
         raise HTTPException(500, f"Ошибка распознавания: {str(e)}")
 
     return parsed_data
-
